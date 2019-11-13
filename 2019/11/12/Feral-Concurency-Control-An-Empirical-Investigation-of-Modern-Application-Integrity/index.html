@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Reading Note," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -79,15 +79,14 @@
 
 
 
-<meta name="description" content="论文🔗：http:&#x2F;&#x2F;www.istc-cc.cmu.edu&#x2F;publications&#x2F;papers&#x2F;2015&#x2F;feral-sigmod2015.pdf">
-<meta name="keywords" content="Reading Note">
+<meta name="description" content="title: &amp;gt;-  Feral Concurency Control: An Empirical Investigation of Modern Application  Integritytags: Reading Notedate: 2019-11-12 23:11:50 论文🔗：http:&#x2F;&#x2F;www.istc-cc.cmu.edu&#x2F;publications&#x2F;papers&#x2F;2015&#x2F;">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Feral Concurency Control: An Empirical Investigation of Modern Application Integrity">
+<meta property="og:title" content="Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;11&#x2F;12&#x2F;Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity&#x2F;index.html">
 <meta property="og:site_name" content="Flint&#39;s Blog">
-<meta property="og:description" content="论文🔗：http:&#x2F;&#x2F;www.istc-cc.cmu.edu&#x2F;publications&#x2F;papers&#x2F;2015&#x2F;feral-sigmod2015.pdf">
+<meta property="og:description" content="title: &amp;gt;-  Feral Concurency Control: An Empirical Investigation of Modern Application  Integritytags: Reading Notedate: 2019-11-12 23:11:50 论文🔗：http:&#x2F;&#x2F;www.istc-cc.cmu.edu&#x2F;publications&#x2F;papers&#x2F;2015&#x2F;">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-11-13T06:12:43.777Z">
+<meta property="og:updated_time" content="2019-11-13T06:42:37.620Z">
 <meta name="twitter:card" content="summary">
 
 
@@ -124,7 +123,7 @@
 
 
 
-  <title>Feral Concurency Control: An Empirical Investigation of Modern Application Integrity | Flint's Blog</title>
+  <title>Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity | Flint's Blog</title>
   
 
 
@@ -278,7 +277,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Feral Concurency Control: An Empirical Investigation of Modern Application Integrity</h1>
+          <h1 class="post-title" itemprop="name headline">Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity</h1>
         
 
         <div class="post-meta">
@@ -328,7 +327,8 @@
       
 
       
-        <p>论文🔗：<br><a href="http://www.istc-cc.cmu.edu/publications/papers/2015/feral-sigmod2015.pdf" target="_blank" rel="noopener">http://www.istc-cc.cmu.edu/publications/papers/2015/feral-sigmod2015.pdf</a></p>
+        <p>title: &gt;-<br>  Feral Concurency Control: An Empirical Investigation of Modern Application<br>  Integrity<br>tags: Reading Note<br>date: 2019-11-12 23:11:50</p>
+<p>论文🔗：<br><a href="http://www.istc-cc.cmu.edu/publications/papers/2015/feral-sigmod2015.pdf" target="_blank" rel="noopener">http://www.istc-cc.cmu.edu/publications/papers/2015/feral-sigmod2015.pdf</a></p>
 <a id="more"></a>
 
 <h1 id="相关概念"><a href="#相关概念" class="headerlink" title="相关概念"></a>相关概念</h1><ul>
@@ -367,7 +367,38 @@
 <p>通过这些结果，论文回到了改进现有的数据库系统的目标。论文调查了6个其他的主流ORM框架，得出结论“feral”的并发控制机制是行业的大趋势。Rails 等框架的成功体现了 OOP 和关系模型之间的模型不匹配的问题。但同时这些暗示了改进数据库系统的巨大的机会，我们应当改进数据库系统，提供 ORM 友好的界面来更好的服务程序员以及社区，并尽可能降低对性能和可移植性的影响。</p>
 <p>本文的其余部分进行如下。 第2节简要介绍了Rails MVC和部署的背景知识，而第3节则概述了Rails支持的并发控制机制。 第4节分析了开源应用程序中的机制使用情况以及弱隔离下的安全性。 第5节实验性地量化了Rails部署中允许的完整性违规。 第6节介绍了在其他框架中对野性验证的支持，第7节介绍了更好地支持这些框架需求的建议。 第8节介绍了相关工作，第9节总结了经验方法在数据库系统研究中的潜力。</p>
 <h1 id="BACKGROUND"><a href="#BACKGROUND" class="headerlink" title="BACKGROUND"></a>BACKGROUND</h1><p><strong>Ruby On Rails</strong> 采用了MVC架构，其模型层由 Active Record 模式驱动。<br>在 Rails 中，数据库与应用程序是“良性分离”的。数据库相对于应用程序而言进存储模型状态，与应用程序的逻辑分离开来。所有应用程序代码在 Ruby VM 中运行，通过 Active Record 对数据库做适当的调用以便在 VM 的内存中实现模型的集合。相对于数据库层面而言，逻辑仍然保留在应用程序层面。Active Record原生支持多种数据库，因此应用程序逻辑与数据库的种类选择无关。<br>当用户在Rails驱动的web应用上发起一个HTTP请求时，该请求首先被Web服务器接受并传递给Rails worker进程（或进程中的线程）。随后，Rails基于HTTP标头和目的地，确定适当的Controller逻辑并运行它，随后通过Active Record进行的所有数据库调用，然后通过View来渲染一个响应，并将其返回给HTTP服务器——这个过程中，所有Controller逻辑都是独立的，单个应用程序请求之间的<strong>唯一的</strong>协调发生在数据库中，也就是 Active Record 触发的数据库查询、修改等操作。<br>这样带来了一个问题，如果 Rails 在处理用户请求时是独立的，所有的并发的操作会在数据库中会和。但是 Rails 的思想是在应用程序级别维护应用程序逻辑，因此 Rails 提供了一系列的并发控制策略——其中两个在应用程序层面进行—— <code>validation</code> 和 <code>association</code> —— 我们称他们为“feral concurrency control mechanisms”。</p>
-<h1 id="FERAL-MECHANISMS-IN-RAILS"><a href="#FERAL-MECHANISMS-IN-RAILS" class="headerlink" title="FERAL MECHANISMS IN RAILS"></a>FERAL MECHANISMS IN RAILS</h1>
+<h1 id="FERAL-MECHANISMS-IN-RAILS"><a href="#FERAL-MECHANISMS-IN-RAILS" class="headerlink" title="FERAL MECHANISMS IN RAILS"></a>FERAL MECHANISMS IN RAILS</h1><p>Rails 提供了四种主要的并发控制策略。</p>
+<ul>
+<li><p>事务</p>
+<ul>
+<li>通过一系列封装，在数据库事务的支持下，Rails 操作将在实际数据库事务的支持下以事务方式执行。数据库事务可以在数据库配置的默认隔离级别上运行，或者从Rails 4.0.0开始，可以基于每个事务进行配置。</li>
+</ul>
+</li>
+<li><p>锁</p>
+<ul>
+<li>Rails 支持<strong>乐观锁</strong>和<strong>悲观锁</strong>。<ul>
+<li>TODO：进一步理解</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Validation（验证）</p>
+<ul>
+<li><p>Rails 提供应用程序级别的验证，每个 Active Record 模型有一组零个或多个验证或者是bool函数，当所有的都返回 true 时，实例才可以存到数据库中。</p>
+</li>
+<li><p>Rails 既提供了内置的验证，也支持用户自定义各种验证。</p>
+</li>
+</ul>
+</li>
+<li><p>Association（关联）</p>
+<ul>
+<li>Association 也是应用程序级别的机制，类似于 RDBMS 中的外键约束。将关联与合适的验证耦合在一起可以确保该关联确实是有意义的。</li>
+</ul>
+</li>
+</ul>
+<p>Rails 提倡用户使用验证，因为验证不能被最终用户绕开，且方便测试和维护。事实上，文章中测试了67个开源应用，发现验证和关联是最流行的并发控制机制。</p>
+<p>![](/Users/Flint/Library/Application Support/typora-user-images/image-20191113143922116.png)</p>
+
       
     </div>
     
@@ -381,12 +412,6 @@
     
 
     <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/Reading-Note/" rel="tag"># Reading Note</a>
-          
-        </div>
       
 
       
@@ -483,15 +508,6 @@
 
             
 
-            
-              
-              
-              <div class="site-state-item site-state-tags">
-                
-                  <span class="site-state-item-count">1</span>
-                  <span class="site-state-item-name">标签</span>
-                
-              </div>
             
 
           </nav>
