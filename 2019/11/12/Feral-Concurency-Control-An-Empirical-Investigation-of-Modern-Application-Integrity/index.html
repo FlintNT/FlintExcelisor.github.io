@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Flint&#39;s Blog">
 <meta property="og:description" content="论文🔗：http:&#x2F;&#x2F;www.istc-cc.cmu.edu&#x2F;publications&#x2F;papers&#x2F;2015&#x2F;feral-sigmod2015.pdf">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-11-13T05:36:18.377Z">
+<meta property="og:updated_time" content="2019-11-13T06:12:43.777Z">
 <meta name="twitter:card" content="summary">
 
 
@@ -332,15 +332,32 @@
 <a id="more"></a>
 
 <h1 id="相关概念"><a href="#相关概念" class="headerlink" title="相关概念"></a>相关概念</h1><ul>
-<li>ORM（对象关系映射 Objective/Relational Mapping）<ul>
+<li><p>ORM（对象关系映射 Objective/Relational Mapping）</p>
+<ul>
 <li>结合了面向对象编程和关系型数据库两种技术。面向对象编程把所有实体看作对象（object），关系型数据库采用实体之间的关系（relation）连接数据。因此有人提出用对象来表达关系，这样就可以用面向对象编程的方法操作关系型数据库。<strong>简单说，ORM 就是通过实例对象的语法，完成关系型数据库的操作的技术，是“对象-关系映射”（Object/Relational Mapping）的缩写。</strong></li>
 <li>ORM 使用对象封装了数据库操作，因此开发者无需使用 SQL 语言，只要使用面向对象编程，就可以与数据对象直接交互，而不需要关心底层数据库。这样的缺点也很明显，ORM 抽象掉了数据库层，开发者无法了解底层的数据库操作，也无法定制一些特殊的SQL。</li>
 <li>TODO：上手学习一个ORM库。<a href="http://www.ruanyifeng.com/blog/2019/02/orm-tutorial.html" target="_blank" rel="noopener">阮一峰老师的例子</a></li>
 <li>ORM 将数据库的四类基本操作<code>create</code>（新建）、<code>read</code>（读取）、<code>update</code>（更新）、<code>delete</code>（删除），都变成了对象的方法。</li>
 </ul>
 </li>
-<li><strong>invariant confluence analysis</strong> <ul>
+<li><p><strong>invariant confluence analysis</strong> </p>
+<ul>
 <li>TODO：</li>
+</ul>
+</li>
+<li><p>Rails 和 MVC</p>
+<ul>
+<li>Rails 采用了 “MVC” 三层次应用程序架构，从外而内分别为 View 、Control 、和 Model。<ul>
+<li>M —— Model 层：是一个基本的ORM，管理用户操作所需要的信息。</li>
+<li>V —— View 层：面向用户的视图层，提供给用户操作界面，是应用程序的外壳。</li>
+<li>C —— Controller 层：实现用户的各种操作。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Active Record</p>
+<ul>
+<li><strong>Active Record</strong> 是一种<a href="https://zh.wikipedia.org/wiki/领域模型" target="_blank" rel="noopener">领域模型</a>模式，特点是一个模型类对应<a href="https://zh.wikipedia.org/wiki/关系型数据库" target="_blank" rel="noopener">关系型数据库</a>中的一个表，而模型类的一个实例对应表中的一行记录。关系型数据库往往通过外键来表述实体关系，Active Record在数据源层面上也将这种关系映射为对象的关联和聚集。在 Martin Fowler 2003年出版的《企业应用架构模式》一书中详细叙述并命名了本模式。Active Record 驱动的框架中，最著名的例子是全栈（Full Stack）Web开发框架 Ruby on Rails，其默认使用一个纯 Ruby 写成的 Active Record 框架来驱动MVC中的模型层。</li>
 </ul>
 </li>
 </ul>
@@ -349,7 +366,8 @@
 <p>文章选取了具有代表性的67个基于 Rails 构建的开源应用并对它们对于 Rails 的“feral”并发控制的实现进行了检查，发现它们绝大多数都使用了 Rails 内建的不变性支持—— <code>validation</code> 和 <code>association</code> 来保护数据完整性，而不是使用应用程序定义的事务机制。并且后者的使用频率降低了37倍以上。在对67个样例的调查中，作者发现应用程序级别的<code>validation</code>大量使用，用来验证引用完整性，唯一性和对通用数据格式的遵循性。很自然的，有必要探讨这些应用程序级别的“feral”机制是否正确工作。文章中记录了作者通过<code>invariant confluence analysis</code>方法，得出这些“feral” validation在86.9%（按数量计算）的情况下是正确的，但是在剩余情况下，（包括插入下的唯一性违例和删除下的外键约束违例）这不是。作者进一步证明在较高的工作负载情况下，验证（<code>validation</code>）将数据损坏的严重性降低了几个数量级，但仍然允许严重违反完整性的行为。</p>
 <p>通过这些结果，论文回到了改进现有的数据库系统的目标。论文调查了6个其他的主流ORM框架，得出结论“feral”的并发控制机制是行业的大趋势。Rails 等框架的成功体现了 OOP 和关系模型之间的模型不匹配的问题。但同时这些暗示了改进数据库系统的巨大的机会，我们应当改进数据库系统，提供 ORM 友好的界面来更好的服务程序员以及社区，并尽可能降低对性能和可移植性的影响。</p>
 <p>本文的其余部分进行如下。 第2节简要介绍了Rails MVC和部署的背景知识，而第3节则概述了Rails支持的并发控制机制。 第4节分析了开源应用程序中的机制使用情况以及弱隔离下的安全性。 第5节实验性地量化了Rails部署中允许的完整性违规。 第6节介绍了在其他框架中对野性验证的支持，第7节介绍了更好地支持这些框架需求的建议。 第8节介绍了相关工作，第9节总结了经验方法在数据库系统研究中的潜力。</p>
-
+<h1 id="BACKGROUND"><a href="#BACKGROUND" class="headerlink" title="BACKGROUND"></a>BACKGROUND</h1><p><strong>Ruby On Rails</strong> 采用了MVC架构，其模型层由 Active Record 模式驱动。<br>在 Rails 中，数据库与应用程序是“良性分离”的。数据库相对于应用程序而言进存储模型状态，与应用程序的逻辑分离开来。所有应用程序代码在 Ruby VM 中运行，通过 Active Record 对数据库做适当的调用以便在 VM 的内存中实现模型的集合。相对于数据库层面而言，逻辑仍然保留在应用程序层面。Active Record原生支持多种数据库，因此应用程序逻辑与数据库的种类选择无关。<br>当用户在Rails驱动的web应用上发起一个HTTP请求时，该请求首先被Web服务器接受并传递给Rails worker进程（或进程中的线程）。随后，Rails基于HTTP标头和目的地，确定适当的Controller逻辑并运行它，随后通过Active Record进行的所有数据库调用，然后通过View来渲染一个响应，并将其返回给HTTP服务器——这个过程中，所有Controller逻辑都是独立的，单个应用程序请求之间的<strong>唯一的</strong>协调发生在数据库中，也就是 Active Record 触发的数据库查询、修改等操作。<br>这样带来了一个问题，如果 Rails 在处理用户请求时是独立的，所有的并发的操作会在数据库中会和。但是 Rails 的思想是在应用程序级别维护应用程序逻辑，因此 Rails 提供了一系列的并发控制策略——其中两个在应用程序层面进行—— <code>validation</code> 和 <code>association</code> —— 我们称他们为“feral concurrency control mechanisms”。</p>
+<h1 id="FERAL-MECHANISMS-IN-RAILS"><a href="#FERAL-MECHANISMS-IN-RAILS" class="headerlink" title="FERAL MECHANISMS IN RAILS"></a>FERAL MECHANISMS IN RAILS</h1>
       
     </div>
     
@@ -519,7 +537,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#相关概念"><span class="nav-number">1.</span> <span class="nav-text">相关概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ABSTRACT"><span class="nav-number">2.</span> <span class="nav-text">ABSTRACT</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#INTRODUCTION"><span class="nav-number">3.</span> <span class="nav-text">INTRODUCTION</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#相关概念"><span class="nav-number">1.</span> <span class="nav-text">相关概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ABSTRACT"><span class="nav-number">2.</span> <span class="nav-text">ABSTRACT</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#INTRODUCTION"><span class="nav-number">3.</span> <span class="nav-text">INTRODUCTION</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BACKGROUND"><span class="nav-number">4.</span> <span class="nav-text">BACKGROUND</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FERAL-MECHANISMS-IN-RAILS"><span class="nav-number">5.</span> <span class="nav-text">FERAL MECHANISMS IN RAILS</span></a></li></ol></div>
             
 
           </div>
