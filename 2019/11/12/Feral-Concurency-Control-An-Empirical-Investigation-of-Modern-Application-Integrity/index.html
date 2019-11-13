@@ -88,7 +88,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;11&#x2F;12&#x2F;Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity&#x2F;table2.png">
 <meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;images&#x2F;table2.jpg">
-<meta property="og:updated_time" content="2019-11-13T07:12:07.192Z">
+<meta property="og:updated_time" content="2019-11-13T10:11:18.366Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;11&#x2F;12&#x2F;Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity&#x2F;table2.png">
 
@@ -363,13 +363,21 @@
 <li><strong>Active Record</strong> 是一种<a href="https://zh.wikipedia.org/wiki/领域模型" target="_blank" rel="noopener">领域模型</a>模式，特点是一个模型类对应<a href="https://zh.wikipedia.org/wiki/关系型数据库" target="_blank" rel="noopener">关系型数据库</a>中的一个表，而模型类的一个实例对应表中的一行记录。关系型数据库往往通过外键来表述实体关系，Active Record在数据源层面上也将这种关系映射为对象的关联和聚集。在 Martin Fowler 2003年出版的《企业应用架构模式》一书中详细叙述并命名了本模式。Active Record 驱动的框架中，最著名的例子是全栈（Full Stack）Web开发框架 Ruby on Rails，其默认使用一个纯 Ruby 写成的 Active Record 框架来驱动MVC中的模型层。</li>
 </ul>
 </li>
+<li><p>I-Confluence 分析</p>
+<ul>
+<li>TODO：</li>
+</ul>
+</li>
 </ul>
 <h1 id="ABSTRACT"><a href="#ABSTRACT" class="headerlink" title="ABSTRACT"></a>ABSTRACT</h1><p>“web 2.0”的兴起催生了一系列的新的框架，它们很多都体现了 ORM 的思想。这边文章主要研究了现代的 ORM 应用程序在并发控制方面采取的策略——是采用了数据库层面的策略，还是采用了应用程序层面的策略，并且通过适当的例子来探究这些策略的实际效果以及潜在的安全问题。</p>
 <h1 id="INTRODUCTION"><a href="#INTRODUCTION" class="headerlink" title="INTRODUCTION"></a>INTRODUCTION</h1><p>文章选取了目前的热门框架 <em>Ruby on Rails</em> （以下简称为“Rails”）进行研究。 Rails有着活跃的社区，已经流行了十几年，极具代表性。Rails 代表了“NoSQL”的思想——将应用程序与数据库分离，在应用程序层面实现业务逻辑。Rails 在应用程序层实现了一套“feral”的并发控制系统。本篇论文将会检查这些“feral”机制的设计和实际应用，评估其在实践中的有效性。</p>
 <p>文章选取了具有代表性的67个基于 Rails 构建的开源应用并对它们对于 Rails 的“feral”并发控制的实现进行了检查，发现它们绝大多数都使用了 Rails 内建的不变性支持—— <code>validation</code> 和 <code>association</code> 来保护数据完整性，而不是使用应用程序定义的事务机制。并且后者的使用频率降低了37倍以上。在对67个样例的调查中，作者发现应用程序级别的<code>validation</code>大量使用，用来验证引用完整性，唯一性和对通用数据格式的遵循性。很自然的，有必要探讨这些应用程序级别的“feral”机制是否正确工作。文章中记录了作者通过<code>invariant confluence analysis</code>方法，得出这些“feral” validation在86.9%（按数量计算）的情况下是正确的，但是在剩余情况下，（包括插入下的唯一性违例和删除下的外键约束违例）这不是。作者进一步证明在较高的工作负载情况下，验证（<code>validation</code>）将数据损坏的严重性降低了几个数量级，但仍然允许严重违反完整性的行为。</p>
 <p>通过这些结果，论文回到了改进现有的数据库系统的目标。论文调查了6个其他的主流ORM框架，得出结论“feral”的并发控制机制是行业的大趋势。Rails 等框架的成功体现了 OOP 和关系模型之间的模型不匹配的问题。但同时这些暗示了改进数据库系统的巨大的机会，我们应当改进数据库系统，提供 ORM 友好的界面来更好的服务程序员以及社区，并尽可能降低对性能和可移植性的影响。</p>
 <p>本文的其余部分进行如下。 第2节简要介绍了Rails MVC和部署的背景知识，而第3节则概述了Rails支持的并发控制机制。 第4节分析了开源应用程序中的机制使用情况以及弱隔离下的安全性。 第5节实验性地量化了Rails部署中允许的完整性违规。 第6节介绍了在其他框架中对野性验证的支持，第7节介绍了更好地支持这些框架需求的建议。 第8节介绍了相关工作，第9节总结了经验方法在数据库系统研究中的潜力。</p>
-<h1 id="BACKGROUND"><a href="#BACKGROUND" class="headerlink" title="BACKGROUND"></a>BACKGROUND</h1><p><strong>Ruby On Rails</strong> 采用了MVC架构，其模型层由 Active Record 模式驱动。<br>在 Rails 中，数据库与应用程序是“良性分离”的。数据库相对于应用程序而言进存储模型状态，与应用程序的逻辑分离开来。所有应用程序代码在 Ruby VM 中运行，通过 Active Record 对数据库做适当的调用以便在 VM 的内存中实现模型的集合。相对于数据库层面而言，逻辑仍然保留在应用程序层面。Active Record原生支持多种数据库，因此应用程序逻辑与数据库的种类选择无关。<br>当用户在Rails驱动的web应用上发起一个HTTP请求时，该请求首先被Web服务器接受并传递给Rails worker进程（或进程中的线程）。随后，Rails基于HTTP标头和目的地，确定适当的Controller逻辑并运行它，随后通过Active Record进行的所有数据库调用，然后通过View来渲染一个响应，并将其返回给HTTP服务器——这个过程中，所有Controller逻辑都是独立的，单个应用程序请求之间的<strong>唯一的</strong>协调发生在数据库中，也就是 Active Record 触发的数据库查询、修改等操作。<br>这样带来了一个问题，如果 Rails 在处理用户请求时是独立的，所有的并发的操作会在数据库中会和。但是 Rails 的思想是在应用程序级别维护应用程序逻辑，因此 Rails 提供了一系列的并发控制策略——其中两个在应用程序层面进行—— <code>validation</code> 和 <code>association</code> —— 我们称他们为“feral concurrency control mechanisms”。</p>
+<h1 id="BACKGROUND"><a href="#BACKGROUND" class="headerlink" title="BACKGROUND"></a>BACKGROUND</h1><p><strong>Ruby On Rails</strong> 采用了MVC架构，其模型层由 Active Record 模式驱动。</p>
+<p>在 Rails 中，数据库与应用程序是“良性分离”的。数据库相对于应用程序而言进存储模型状态，与应用程序的逻辑分离开来。所有应用程序代码在 Ruby VM 中运行，通过 Active Record 对数据库做适当的调用以便在 VM 的内存中实现模型的集合。相对于数据库层面而言，逻辑仍然保留在应用程序层面。Active Record原生支持多种数据库，因此应用程序逻辑与数据库的种类选择无关。</p>
+<p>当用户在Rails驱动的web应用上发起一个HTTP请求时，该请求首先被Web服务器接受并传递给Rails worker进程（或进程中的线程）。随后，Rails基于HTTP标头和目的地，确定适当的Controller逻辑并运行它，随后通过Active Record进行的所有数据库调用，然后通过View来渲染一个响应，并将其返回给HTTP服务器——这个过程中，所有Controller逻辑都是独立的，单个应用程序请求之间的<strong>唯一的</strong>协调发生在数据库中，也就是 Active Record 触发的数据库查询、修改等操作。</p>
+<p>这样带来了一个问题，如果 Rails 在处理用户请求时是独立的，所有的并发的操作会在数据库中会和。但是 Rails 的思想是在应用程序级别维护应用程序逻辑，因此 Rails 提供了一系列的并发控制策略——其中两个在应用程序层面进行—— <code>validation</code> 和 <code>association</code> —— 我们称他们为“feral concurrency control mechanisms”。</p>
 <h1 id="FERAL-MECHANISMS-IN-RAILS"><a href="#FERAL-MECHANISMS-IN-RAILS" class="headerlink" title="FERAL MECHANISMS IN RAILS"></a>FERAL MECHANISMS IN RAILS</h1><p>Rails 提供了四种主要的并发控制策略。</p>
 <ul>
 <li><p>事务</p>
@@ -404,6 +412,60 @@
 <img src="/2019/11/12/Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity/table2.png" class="" title="This is an example image">
 
 <p><img src="/images/table2.jpg" alt=""> –&gt;</p>
+<p>文章作者对应用程序进行了简单分析，以确定每种并发控制机制的使用方式（有关更多方法学细节，请参见附录A）。绝大多数情况下，应用程序未使用事务或锁（图1和表2）。平均而言，每个模型的应用程序使用0.13个事务，0.01个锁，1.80个验证和3.19个关联（每个应用程序平均29.1个模型）。尽管有46个（68.7％）的应用程序使用事务处理，但所有应用程序都使用了一些验证或关联。只有六个应用程序使用了锁。悲观锁的使用是乐观锁的两倍。</p>
+<p>其中最值得注意的是，验证和关联的发生率分别比事务处理高出13.6倍和24.2倍，比乐观锁和悲观锁高出几个数量级。这说明 Rails 程序的开发者更喜欢自己指定正确新标准，而不是选择数据库的事务处理。然而自己设立标准就会带来隐患——这样真的能保证程序确实正确吗？</p>
+<p>因此本文其余的大部分工作就是检查这些 feral 机制是否正确维护了程序的正确性和一致性。</p>
+<p>文章也针对一个具体的例子做了分析：</p>
+<ul>
+<li>TODO：Spree的例子</li>
+</ul>
+<p>作者进一步对这些项目进行了分析：</p>
+<ul>
+<li>分析了每个项目生命周期中的模型，交易，验证和关联的数量。作者利用每个项目的Git历史记录，在项目的整个生命周期（以提交次数衡量）中以固定的间隔重复分析。<ul>
+<li>结果显示：对数据模型的添加在事务，验证和关联的其他使用之前（通常是相当大的数量）。目前尚不清楚大量并发控制使用量的增加是为了纠正并发问题，还是由于Controller代码和业务逻辑的自然增长。但是，模型和并发控制使用之间的差距会随着时间的推移而缩小。因此，数据模型的稳定程度似乎快于控制器逻辑，但两者最终都会稳定下来。作者认为，沿着这些思路进行额外的纵向分析是值得未来开展的工作。</li>
+</ul>
+</li>
+<li>其次，对作者在提交内容中的分布情况与作者在验证和关联中的分布情况进行比较。<ul>
+<li>结果显示：（用累计分布函数（CDF）描述）所有提交中的95％由42.4％的作者编写。但是，只有20.3％的作者创作了95％的不变式（验证加关联）。</li>
+</ul>
+</li>
+</ul>
+<h1 id="ISOLATION-AND-INTEGRITY"><a href="#ISOLATION-AND-INTEGRITY" class="headerlink" title="ISOLATION AND INTEGRITY"></a>ISOLATION AND INTEGRITY</h1><h2 id="Rails-基于数据库默认的隔离级别"><a href="#Rails-基于数据库默认的隔离级别" class="headerlink" title="Rails 基于数据库默认的隔离级别"></a>Rails 基于数据库默认的隔离级别</h2><p>对于 Rails ，MySQL 和 PostgreSQL 默认是较弱的读取提交级别和可重复读取隔离级别。也没有明确的证据表明应用程序更改了隔离级别，因此很可能 Rails 应用的确运行在这样的较弱的隔离级别下。如果是较强的序列化隔离，则可以保证完整性，但是较弱的情况下就不一定。</p>
+<p>为了确切地了解是否程序是否正确，作者使用了I-Confluence分析（Invariant confluence）。Invariant confluence 提供了在无协调的情况下，并发的事务执行下，仍然保持不变性的<strong>充分必要条件</strong>。</p>
+<blockquote>
+<p>Informally, the condition ensures that, if transactions maintain database states that are correct with respect to an invariant when run in isolation, the transactions can be run simultaneously and their results com- bined (“merged”) to produce another correct state. </p>
+</blockquote>
+<h2 id="Rails内置的验证"><a href="#Rails内置的验证" class="headerlink" title="Rails内置的验证"></a>Rails内置的验证</h2><p>Table1 按照内置验证出现的频率排列，标出了它们是否是“I-Confluent”的。Table 1 显示使用频率第二高的<code>validates_uniqueness_of</code>不是“I-Confluent”的。<code>validates_associated</code>是否是“I-Confluent”的取决于操作——操作是插入时为“I-Confluent”，操作为混合插入和删除时不是“I-Confluent”的。剩余的内置的验证全部都满足“I-Confluent”。从出现数量上看，在插入操作下，86.9% 的内置验证“I-Confluent”；在删除操作下，36.6% 的内置验证是“I-Confluent”的。但是，取决于工作量，关联和多记录的唯一性不是I融合的，因此很可能会引起问题。 在下一节中，我们将更详细地检查这些验证。</p>
+<h2 id="用户自定义的验证"><a href="#用户自定义的验证" class="headerlink" title="用户自定义的验证"></a>用户自定义的验证</h2><p>这方面文章由于篇幅限制只讨论了结果所表现的大趋势。</p>
+<p>“I-Confluent”的自定义验证大多是简单的格式检查或者特定的域的检验；不是“I-Confluent”的自定义验证则很多样。总之，绝大多数自定义验证是安全的——但是在并发执行时应该特别注意不是“I-Confluent”的验证的安全性。</p>
+<h1 id="QUANTIFYING-FERAL-ANOMALIES"><a href="#QUANTIFYING-FERAL-ANOMALIES" class="headerlink" title="QUANTIFYING FERAL ANOMALIES"></a>QUANTIFYING FERAL ANOMALIES</h1><p>这一部分中，作者量化的研究了使用频率最高的两个非“I-Confluent”验证——唯一性验证和外键验证的影响。</p>
+<h2 id="Uniqueness-Constraints-and-Isolation"><a href="#Uniqueness-Constraints-and-Isolation" class="headerlink" title="Uniqueness Constraints and Isolation"></a>Uniqueness Constraints and Isolation</h2><p>用户级别的唯一性验证虽然在事务内运行，但是事务的隔离级别会影响其正确性。只有在序列化隔离下才是安全的——但是 MySQL 和 PostgreSQL 默认是更弱的隔离级别，这样就带来了隐患！</p>
+<h3 id="Understanding-validation-behavior"><a href="#Understanding-validation-behavior" class="headerlink" title="Understanding validation behavior."></a>Understanding validation behavior.</h3><p>Feral 机制允许引入重复项，但是最坏情况下，假设有 p 个进程，单个线程，则最多引入 p 个重复项。因此，至少在理论上，验证限制了数据库表中每个唯一值的最坏情况重复记录数。</p>
+<h2 id="Quantifying-Uniqueness-Anomalies"><a href="#Quantifying-Uniqueness-Anomalies" class="headerlink" title="Quantifying Uniqueness Anomalies"></a>Quantifying Uniqueness Anomalies</h2><p>这一部分用实验说明在非序列化隔离下，唯一性验证的确会出错，从而引入重复项。</p>
+<ul>
+<li>超高的工作量测试结果：<ul>
+<li>Figure 2 的显示，使用唯一性验证的情况下所导致的重复记录与不使用相比，减少了近一个数量级——但是仍然存在许多。而在数据库内部添加唯一性索引并重复实验，发现完全没有重复记录出现。</li>
+</ul>
+</li>
+<li>日常工作量的测试结果：<ul>
+<li>TODO：描述是个测试结果</li>
+</ul>
+</li>
+</ul>
+<h2 id="Association-Validations-and-Isolation"><a href="#Association-Validations-and-Isolation" class="headerlink" title="Association Validations and Isolation"></a>Association Validations and Isolation</h2><p>事务的确切隔离级别同样影响到了关联验证的正确性。为了正确执行，<code>SELECT</code>查询还必须在事务期间内对validated列的特定值获得谓词锁定。除非将数据库配置为可序列化隔离，否则可能会导致不一致，并且 feral 验证将无法防止数据损坏。</p>
+<h2 id="Quantifying-Association-Anomalies"><a href="#Quantifying-Association-Anomalies" class="headerlink" title="Quantifying Association Anomalies"></a>Quantifying Association Anomalies</h2><p>TBD</p>
+<h2 id="Takeaways-and-Discussion"><a href="#Takeaways-and-Discussion" class="headerlink" title="Takeaways and Discussion"></a>Takeaways and Discussion</h2><p>TBD</p>
+<h1 id="IMPLICATIONS-FOR-DATABASES"><a href="#IMPLICATIONS-FOR-DATABASES" class="headerlink" title="IMPLICATIONS FOR DATABASES"></a>IMPLICATIONS FOR DATABASES</h1><p>TBD</p>
+<h2 id="Summary-Shortcomings-Today"><a href="#Summary-Shortcomings-Today" class="headerlink" title="Summary: Shortcomings Today"></a>Summary: Shortcomings Today</h2><ul>
+<li>TBD</li>
+<li>TBD</li>
+</ul>
+<p>总而言之，当今的应用程序编写者缺乏一种在保持高性能和可编程性的同时保证正确性的解决方案。可串行化对于某些应用程序来说太昂贵了，没有得到广泛的支持，并且对于许多应用程序不变式也不是必须的。并发控制通常较便宜，并且轻便可移植，但不足以用于许多其他应用程序不变式。在任何一种情况下，数据库都不会尊重并帮助应用程序程序员期望使用干净，惯用的方式在域逻辑中表达正确性标准。因此，构建提供所有三个标准的系统是机遇和迫切需要的：性能，正确性和可编程性。</p>
+<h2 id="Domesticating-Feral-Mechanisms"><a href="#Domesticating-Feral-Mechanisms" class="headerlink" title="Domesticating Feral Mechanisms"></a>Domesticating Feral Mechanisms</h2><ol>
+<li><em>Express correctness criteria in the language of their domain model, with minimal friction, while permitting their automatic enforcement.</em>  </li>
+<li><em>Only pay the price of coordination when necessary.</em></li>
+<li><em>Easily deploy to multiple database backends.</em></li>
+</ol>
 -->
       
     </div>
