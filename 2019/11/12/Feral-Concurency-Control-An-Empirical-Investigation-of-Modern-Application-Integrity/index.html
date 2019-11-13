@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Reading Note," />
 
 
 
@@ -79,15 +79,19 @@
 
 
 
-<meta name="description" content="title: &amp;gt;-  Feral Concurency Control: An Empirical Investigation of Modern Application  Integritytags: Reading Notedate: 2019-11-12 23:11:50 论文🔗：http:&#x2F;&#x2F;www.istc-cc.cmu.edu&#x2F;publications&#x2F;papers&#x2F;2015&#x2F;">
+<meta name="description" content="论文🔗：http:&#x2F;&#x2F;www.istc-cc.cmu.edu&#x2F;publications&#x2F;papers&#x2F;2015&#x2F;feral-sigmod2015.pdf">
+<meta name="keywords" content="Reading Note">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity">
+<meta property="og:title" content="Feral Concurency Control: An Empirical Investigation of Modern Application Integrity">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;11&#x2F;12&#x2F;Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity&#x2F;index.html">
 <meta property="og:site_name" content="Flint&#39;s Blog">
-<meta property="og:description" content="title: &amp;gt;-  Feral Concurency Control: An Empirical Investigation of Modern Application  Integritytags: Reading Notedate: 2019-11-12 23:11:50 论文🔗：http:&#x2F;&#x2F;www.istc-cc.cmu.edu&#x2F;publications&#x2F;papers&#x2F;2015&#x2F;">
+<meta property="og:description" content="论文🔗：http:&#x2F;&#x2F;www.istc-cc.cmu.edu&#x2F;publications&#x2F;papers&#x2F;2015&#x2F;feral-sigmod2015.pdf">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-11-13T10:20:05.643Z">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;11&#x2F;12&#x2F;Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity&#x2F;table2.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;images&#x2F;table2.jpg">
+<meta property="og:updated_time" content="2019-11-13T10:25:39.956Z">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;11&#x2F;12&#x2F;Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity&#x2F;table2.png">
 
 
 
@@ -123,7 +127,7 @@
 
 
 
-  <title>Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity | Flint's Blog</title>
+  <title>Feral Concurency Control: An Empirical Investigation of Modern Application Integrity | Flint's Blog</title>
   
 
 
@@ -277,7 +281,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity</h1>
+          <h1 class="post-title" itemprop="name headline">Feral Concurency Control: An Empirical Investigation of Modern Application Integrity</h1>
         
 
         <div class="post-meta">
@@ -327,8 +331,7 @@
       
 
       
-        <p>title: &gt;-<br>  Feral Concurency Control: An Empirical Investigation of Modern Application<br>  Integrity<br>tags: Reading Note<br>date: 2019-11-12 23:11:50</p>
-<p>论文🔗：<br><a href="http://www.istc-cc.cmu.edu/publications/papers/2015/feral-sigmod2015.pdf" target="_blank" rel="noopener">http://www.istc-cc.cmu.edu/publications/papers/2015/feral-sigmod2015.pdf</a></p>
+        <p>论文🔗：<br><a href="http://www.istc-cc.cmu.edu/publications/papers/2015/feral-sigmod2015.pdf" target="_blank" rel="noopener">http://www.istc-cc.cmu.edu/publications/papers/2015/feral-sigmod2015.pdf</a></p>
 <a id="more"></a>
 
 <h1 id="相关概念"><a href="#相关概念" class="headerlink" title="相关概念"></a>相关概念</h1><ul>
@@ -405,6 +408,10 @@
 </li>
 </ul>
 <p>Rails 提倡用户使用验证，因为验证不能被最终用户绕开，且方便测试和维护。事实上，文章中测试了67个开源应用，发现验证和关联是最流行的并发控制机制。</p>
+<!-- ![](/Users/Flint/FlintNT.github.io/source/_posts/Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity/table2.png)
+<img src="/2019/11/12/Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity/table2.png" class="" title="This is an example image">
+
+<p><img src="/images/table2.jpg" alt=""> –&gt;</p>
 <p>文章作者对应用程序进行了简单分析，以确定每种并发控制机制的使用方式（有关更多方法学细节，请参见附录A）。绝大多数情况下，应用程序未使用事务或锁（图1和表2）。平均而言，每个模型的应用程序使用0.13个事务，0.01个锁，1.80个验证和3.19个关联（每个应用程序平均29.1个模型）。尽管有46个（68.7％）的应用程序使用事务处理，但所有应用程序都使用了一些验证或关联。只有六个应用程序使用了锁。悲观锁的使用是乐观锁的两倍。</p>
 <p>其中最值得注意的是，验证和关联的发生率分别比事务处理高出13.6倍和24.2倍，比乐观锁和悲观锁高出几个数量级。这说明 Rails 程序的开发者更喜欢自己指定正确新标准，而不是选择数据库的事务处理。然而自己设立标准就会带来隐患——这样真的能保证程序确实正确吗？</p>
 <p>因此本文其余的大部分工作就是检查这些 feral 机制是否正确维护了程序的正确性和一致性。</p>
@@ -426,7 +433,7 @@
 <h1 id="ISOLATION-AND-INTEGRITY"><a href="#ISOLATION-AND-INTEGRITY" class="headerlink" title="ISOLATION AND INTEGRITY"></a>ISOLATION AND INTEGRITY</h1><h2 id="Rails-基于数据库默认的隔离级别"><a href="#Rails-基于数据库默认的隔离级别" class="headerlink" title="Rails 基于数据库默认的隔离级别"></a>Rails 基于数据库默认的隔离级别</h2><p>对于 Rails ，MySQL 和 PostgreSQL 默认是较弱的读取提交级别和可重复读取隔离级别。也没有明确的证据表明应用程序更改了隔离级别，因此很可能 Rails 应用的确运行在这样的较弱的隔离级别下。如果是较强的序列化隔离，则可以保证完整性，但是较弱的情况下就不一定。</p>
 <p>为了确切地了解是否程序是否正确，作者使用了I-Confluence分析（Invariant confluence）。Invariant confluence 提供了在无协调的情况下，并发的事务执行下，仍然保持不变性的<strong>充分必要条件</strong>。</p>
 <blockquote>
-<p>Informally, the condition ensures that, if transactions maintain database states that are correct with respect to an invariant when run in isolation, the transactions can be run simultaneously and their results combined (“merged”) to produce another correct state.</p>
+<p>Informally, the condition ensures that, if transactions maintain database states that are correct with respect to an invariant when run in isolation, the transactions can be run simultaneously and their results com- bined (“merged”) to produce another correct state. </p>
 </blockquote>
 <h2 id="Rails内置的验证"><a href="#Rails内置的验证" class="headerlink" title="Rails内置的验证"></a>Rails内置的验证</h2><p>Table1 按照内置验证出现的频率排列，标出了它们是否是“I-Confluent”的。Table 1 显示使用频率第二高的<code>validates_uniqueness_of</code>不是“I-Confluent”的。<code>validates_associated</code>是否是“I-Confluent”的取决于操作——操作是插入时为“I-Confluent”，操作为混合插入和删除时不是“I-Confluent”的。剩余的内置的验证全部都满足“I-Confluent”。从出现数量上看，在插入操作下，86.9% 的内置验证“I-Confluent”；在删除操作下，36.6% 的内置验证是“I-Confluent”的。但是，取决于工作量，关联和多记录的唯一性不是I融合的，因此很可能会引起问题。 在下一节中，我们将更详细地检查这些验证。</p>
 <h2 id="用户自定义的验证"><a href="#用户自定义的验证" class="headerlink" title="用户自定义的验证"></a>用户自定义的验证</h2><p>这方面文章由于篇幅限制只讨论了结果所表现的大趋势。</p>
@@ -459,7 +466,7 @@
 <li><em>Only pay the price of coordination when necessary.</em></li>
 <li><em>Easily deploy to multiple database backends.</em></li>
 </ol>
-
+-->
       
     </div>
     
@@ -474,11 +481,33 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/Reading-Note/" rel="tag"># Reading Note</a>
+          
+        </div>
+      
 
       
       
       
 
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/11/13/%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86%E8%AF%BE%E5%90%8E%E6%80%BB%E7%BB%93/" rel="prev" title="编译原理课后总结">
+                编译原理课后总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
       
 
       
@@ -561,7 +590,7 @@
               
                 <a href="/archives/%20%7C%7C%20archive">
               
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -569,6 +598,15 @@
 
             
 
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
             
 
           </nav>
@@ -614,7 +652,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#相关概念"><span class="nav-number">1.</span> <span class="nav-text">相关概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ABSTRACT"><span class="nav-number">2.</span> <span class="nav-text">ABSTRACT</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#INTRODUCTION"><span class="nav-number">3.</span> <span class="nav-text">INTRODUCTION</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BACKGROUND"><span class="nav-number">4.</span> <span class="nav-text">BACKGROUND</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FERAL-MECHANISMS-IN-RAILS"><span class="nav-number">5.</span> <span class="nav-text">FERAL MECHANISMS IN RAILS</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ISOLATION-AND-INTEGRITY"><span class="nav-number">6.</span> <span class="nav-text">ISOLATION AND INTEGRITY</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Rails-基于数据库默认的隔离级别"><span class="nav-number">6.1.</span> <span class="nav-text">Rails 基于数据库默认的隔离级别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rails内置的验证"><span class="nav-number">6.2.</span> <span class="nav-text">Rails内置的验证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用户自定义的验证"><span class="nav-number">6.3.</span> <span class="nav-text">用户自定义的验证</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#QUANTIFYING-FERAL-ANOMALIES"><span class="nav-number">7.</span> <span class="nav-text">QUANTIFYING FERAL ANOMALIES</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Uniqueness-Constraints-and-Isolation"><span class="nav-number">7.1.</span> <span class="nav-text">Uniqueness Constraints and Isolation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Understanding-validation-behavior"><span class="nav-number">7.1.1.</span> <span class="nav-text">Understanding validation behavior.</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Quantifying-Uniqueness-Anomalies"><span class="nav-number">7.2.</span> <span class="nav-text">Quantifying Uniqueness Anomalies</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Association-Validations-and-Isolation"><span class="nav-number">7.3.</span> <span class="nav-text">Association Validations and Isolation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Quantifying-Association-Anomalies"><span class="nav-number">7.4.</span> <span class="nav-text">Quantifying Association Anomalies</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Takeaways-and-Discussion"><span class="nav-number">7.5.</span> <span class="nav-text">Takeaways and Discussion</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IMPLICATIONS-FOR-DATABASES"><span class="nav-number">8.</span> <span class="nav-text">IMPLICATIONS FOR DATABASES</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Summary-Shortcomings-Today"><span class="nav-number">8.1.</span> <span class="nav-text">Summary: Shortcomings Today</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Domesticating-Feral-Mechanisms"><span class="nav-number">8.2.</span> <span class="nav-text">Domesticating Feral Mechanisms</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#相关概念"><span class="nav-number">1.</span> <span class="nav-text">相关概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ABSTRACT"><span class="nav-number">2.</span> <span class="nav-text">ABSTRACT</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#INTRODUCTION"><span class="nav-number">3.</span> <span class="nav-text">INTRODUCTION</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BACKGROUND"><span class="nav-number">4.</span> <span class="nav-text">BACKGROUND</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FERAL-MECHANISMS-IN-RAILS"><span class="nav-number">5.</span> <span class="nav-text">FERAL MECHANISMS IN RAILS</span></a></li></ol></div>
             
 
           </div>
