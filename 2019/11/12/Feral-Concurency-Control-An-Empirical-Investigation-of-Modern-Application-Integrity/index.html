@@ -87,11 +87,8 @@
 <meta property="og:site_name" content="Flint&#39;s Blog">
 <meta property="og:description" content="论文🔗：http:&#x2F;&#x2F;www.istc-cc.cmu.edu&#x2F;publications&#x2F;papers&#x2F;2015&#x2F;feral-sigmod2015.pdf">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;11&#x2F;12&#x2F;Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity&#x2F;table2.png">
-<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;images&#x2F;table2.jpg">
-<meta property="og:updated_time" content="2019-11-13T10:25:39.956Z">
+<meta property="og:updated_time" content="2019-11-14T06:56:54.907Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;11&#x2F;12&#x2F;Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity&#x2F;table2.png">
 
 
 
@@ -368,6 +365,24 @@
 <li>TODO：</li>
 </ul>
 </li>
+<li><p>事务的隔离级别：</p>
+<ul>
+<li><p>隔离性的4个级别，包括<code>读未提交</code>（Read Uncommitted）、<code>读已提交</code>（Read Committed）、<code>可重复读</code>（Repeatable Read）、<code>可序列化</code>（Serializable）。其对应的问题，包括：<code>脏读</code>（Dirty Read）、<code>不可重复读</code>（Nonrepeatble Read）、<code>幻读</code>（Phantom Read）。</p>
+</li>
+<li><p><strong>读未提交</strong>是数据库应保证的最低的隔离性级别：<strong>事务中的修改，即使没有提交，对其他事务也都是可见的</strong>。</p>
+<p>读未提交面临<strong>脏读</strong>的问题：<em>事务可以读取未提交的数据，而该数据可能在未来因回滚而消失</em>。从性能上来说，读未提交不会比其他的级别好太多，但却缺乏其他级别的很多好处。除非真的有非常必要的理由，在实际应用中很少使用。</p>
+</li>
+<li><p><strong>读已提交</strong>满足前面提到的隔离性的简单定义：<strong>一个事务所做的修改在最终提交以前，对其他事务是不可见的</strong>。换句话说，<strong>一旦提交，该事务所作的修改对其他正在进行中的事务就是可见的</strong>。</p>
+<p>狭义上，读已提交解决了脏读的问题。这个级别有时候叫做<strong>不可重复读</strong>，面临不可重复读的问题：<em>两次执行同样的查询，如果第二次读到了其他事务提交的结果，则会得到不一样的结果</em>。</p>
+</li>
+<li><p>在读已提交的基础上，<strong>可重复读</strong>解决了部分不可重复的问题：<strong>同一个事务中多次读取同样记录结果是一致的</strong>。<strong>记录</strong>指具体的数据行。</p>
+<p>未能解决的那部分称为<strong>幻读</strong>：<em>当某个事务在读取目标*</em>范围<strong>内的记录时，另一个事务又在该范围内</strong>插入<strong>了新的记录，当之前的事务再次读取该范围的记录时，会产生第一次读取范围时不存在的</strong><code>幻行</code><strong>（Phantom Row）*。需要注意的是，</strong>只有插入会产生幻行**。</p>
+</li>
+<li><p><strong>可序列化</strong>是最高的隔离级别：<strong>强制事务序列化执行</strong>。</p>
+<p>可序列化解决了幻读问题。简单来说，<em>可序列化会在目标*</em>范围*<em>加独占锁，将并发读写相同范围数据的请求序列化</em>。可序列化会导致大量的超时和锁争用问题，因此，实际应用中很少用到这个隔离级别，只有在非常需要确保数据的一致性而且可以接受没有并发的情况下，才考虑采用该级别。</p>
+</li>
+</ul>
+</li>
 </ul>
 <h1 id="ABSTRACT"><a href="#ABSTRACT" class="headerlink" title="ABSTRACT"></a>ABSTRACT</h1><p>“web 2.0”的兴起催生了一系列的新的框架，它们很多都体现了 ORM 的思想。这边文章主要研究了现代的 ORM 应用程序在并发控制方面采取的策略——是采用了数据库层面的策略，还是采用了应用程序层面的策略，并且通过适当的例子来探究这些策略的实际效果以及潜在的安全问题。</p>
 <h1 id="INTRODUCTION"><a href="#INTRODUCTION" class="headerlink" title="INTRODUCTION"></a>INTRODUCTION</h1><p>文章选取了目前的热门框架 <em>Ruby on Rails</em> （以下简称为“Rails”）进行研究。 Rails有着活跃的社区，已经流行了十几年，极具代表性。Rails 代表了“NoSQL”的思想——将应用程序与数据库分离，在应用程序层面实现业务逻辑。Rails 在应用程序层实现了一套“feral”的并发控制系统。本篇论文将会检查这些“feral”机制的设计和实际应用，评估其在实践中的有效性。</p>
@@ -408,10 +423,6 @@
 </li>
 </ul>
 <p>Rails 提倡用户使用验证，因为验证不能被最终用户绕开，且方便测试和维护。事实上，文章中测试了67个开源应用，发现验证和关联是最流行的并发控制机制。</p>
-<!-- ![](/Users/Flint/FlintNT.github.io/source/_posts/Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity/table2.png)
-<img src="/2019/11/12/Feral-Concurency-Control-An-Empirical-Investigation-of-Modern-Application-Integrity/table2.png" class="" title="This is an example image">
-
-<p><img src="/images/table2.jpg" alt=""> –&gt;</p>
 <p>文章作者对应用程序进行了简单分析，以确定每种并发控制机制的使用方式（有关更多方法学细节，请参见附录A）。绝大多数情况下，应用程序未使用事务或锁（图1和表2）。平均而言，每个模型的应用程序使用0.13个事务，0.01个锁，1.80个验证和3.19个关联（每个应用程序平均29.1个模型）。尽管有46个（68.7％）的应用程序使用事务处理，但所有应用程序都使用了一些验证或关联。只有六个应用程序使用了锁。悲观锁的使用是乐观锁的两倍。</p>
 <p>其中最值得注意的是，验证和关联的发生率分别比事务处理高出13.6倍和24.2倍，比乐观锁和悲观锁高出几个数量级。这说明 Rails 程序的开发者更喜欢自己指定正确新标准，而不是选择数据库的事务处理。然而自己设立标准就会带来隐患——这样真的能保证程序确实正确吗？</p>
 <p>因此本文其余的大部分工作就是检查这些 feral 机制是否正确维护了程序的正确性和一致性。</p>
@@ -457,16 +468,27 @@
 <h2 id="Takeaways-and-Discussion"><a href="#Takeaways-and-Discussion" class="headerlink" title="Takeaways and Discussion"></a>Takeaways and Discussion</h2><p>TBD</p>
 <h1 id="IMPLICATIONS-FOR-DATABASES"><a href="#IMPLICATIONS-FOR-DATABASES" class="headerlink" title="IMPLICATIONS FOR DATABASES"></a>IMPLICATIONS FOR DATABASES</h1><p>TBD</p>
 <h2 id="Summary-Shortcomings-Today"><a href="#Summary-Shortcomings-Today" class="headerlink" title="Summary: Shortcomings Today"></a>Summary: Shortcomings Today</h2><ul>
-<li>TBD</li>
-<li>TBD</li>
+<li>虽然序列化事务处理可以保证应用程序的正确性，包括feral并发控制的正确性。但是使用序列化隔离会导致较大的开销，因此软件开发人员会尽量避免使用序列化；此外许多ACID数据库默认不是序列化隔离，而是较弱的隔离级别。<ul>
+<li>——正确性与性能相冲突</li>
 </ul>
-<p>总而言之，当今的应用程序编写者缺乏一种在保持高性能和可编程性的同时保证正确性的解决方案。可串行化对于某些应用程序来说太昂贵了，没有得到广泛的支持，并且对于许多应用程序不变式也不是必须的。并发控制通常较便宜，并且轻便可移植，但不足以用于许多其他应用程序不变式。在任何一种情况下，数据库都不会尊重并帮助应用程序程序员期望使用干净，惯用的方式在域逻辑中表达正确性标准。因此，构建提供所有三个标准的系统是机遇和迫切需要的：性能，正确性和可编程性。</p>
-<h2 id="Domesticating-Feral-Mechanisms"><a href="#Domesticating-Feral-Mechanisms" class="headerlink" title="Domesticating Feral Mechanisms"></a>Domesticating Feral Mechanisms</h2><ol>
-<li><em>Express correctness criteria in the language of their domain model, with minimal friction, while permitting their automatic enforcement.</em>  </li>
-<li><em>Only pay the price of coordination when necessary.</em></li>
-<li><em>Easily deploy to multiple database backends.</em></li>
-</ol>
--->
+</li>
+<li>应用程序级别的的并发控制是昂贵、容易出错且难度较高的，而且忽略了数据库社区数十年来的贡献。尽管能保证（文章中）87%的正确处理，但是剩余的情形仍然会导致应用程序数据的破坏。<ul>
+<li>——性能与正确性和可编程性冲突</li>
+</ul>
+</li>
+</ul>
+<p>总而言之，当今的应用程序编写者缺乏一种在保持高性能和可编程性的同时保证正确性的解决方案。序列化隔离对于某些应用程序来说太昂贵了，没有得到广泛的支持，并且对于许多应用程序不变式也不是必须的。feral并发控制通常较便宜，并且轻便可移植，但不足以用于许多其他应用程序不变式。在任何一种情况下，数据库都不会尊重并帮助应用程序程序员期望使用干净，惯用的方式在域逻辑中表达正确性标准。因此，作者任务目前急需构建提供所有三个优点的系统：<strong>性能，正确性和可编程性</strong>。</p>
+<h2 id="Domesticating-Feral-Mechanisms"><a href="#Domesticating-Feral-Mechanisms" class="headerlink" title="Domesticating Feral Mechanisms"></a>Domesticating Feral Mechanisms</h2><p>作者紧接着提出了一些思路——通过改进数据库的方式，适当的提供数据库层面的支持来“驯化”这些“feral（野生的）”并发控制机制。</p>
+<ul>
+<li><p><em>Express correctness criteria in the language of their domain model, with minimal friction, while permitting their automatic enforcement.</em>  用领域模型表达正确新标准，同时允许其自动化执行。</p>
+<p>作者认为以后数据库应当对各种ORM框架更加友好。应当能为任何框架下的本地语言编写的不变式提供支持，目前仅仅可以支持一个真子集，还不能支持全部。</p>
+</li>
+<li><p><em>Only pay the price of coordination when necessary.</em> 只有在必要的时候才付出代价——许多不变量可以在没有协调的情况下安全地执行，所以可以进行优化。未来理想的解决方案是使应用程序尽可能避免协调，从而最大限度提升性能和可操作性。数据库应该针对这一方面提供支持。</p>
+</li>
+<li><p><em>Easily deploy to multiple database backends.</em></p>
+</li>
+</ul>
+
       
     </div>
     
@@ -652,7 +674,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#相关概念"><span class="nav-number">1.</span> <span class="nav-text">相关概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ABSTRACT"><span class="nav-number">2.</span> <span class="nav-text">ABSTRACT</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#INTRODUCTION"><span class="nav-number">3.</span> <span class="nav-text">INTRODUCTION</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BACKGROUND"><span class="nav-number">4.</span> <span class="nav-text">BACKGROUND</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FERAL-MECHANISMS-IN-RAILS"><span class="nav-number">5.</span> <span class="nav-text">FERAL MECHANISMS IN RAILS</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#相关概念"><span class="nav-number">1.</span> <span class="nav-text">相关概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ABSTRACT"><span class="nav-number">2.</span> <span class="nav-text">ABSTRACT</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#INTRODUCTION"><span class="nav-number">3.</span> <span class="nav-text">INTRODUCTION</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BACKGROUND"><span class="nav-number">4.</span> <span class="nav-text">BACKGROUND</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FERAL-MECHANISMS-IN-RAILS"><span class="nav-number">5.</span> <span class="nav-text">FERAL MECHANISMS IN RAILS</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ISOLATION-AND-INTEGRITY"><span class="nav-number">6.</span> <span class="nav-text">ISOLATION AND INTEGRITY</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Rails-基于数据库默认的隔离级别"><span class="nav-number">6.1.</span> <span class="nav-text">Rails 基于数据库默认的隔离级别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rails内置的验证"><span class="nav-number">6.2.</span> <span class="nav-text">Rails内置的验证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用户自定义的验证"><span class="nav-number">6.3.</span> <span class="nav-text">用户自定义的验证</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#QUANTIFYING-FERAL-ANOMALIES"><span class="nav-number">7.</span> <span class="nav-text">QUANTIFYING FERAL ANOMALIES</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Uniqueness-Constraints-and-Isolation"><span class="nav-number">7.1.</span> <span class="nav-text">Uniqueness Constraints and Isolation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Understanding-validation-behavior"><span class="nav-number">7.1.1.</span> <span class="nav-text">Understanding validation behavior.</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Quantifying-Uniqueness-Anomalies"><span class="nav-number">7.2.</span> <span class="nav-text">Quantifying Uniqueness Anomalies</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Association-Validations-and-Isolation"><span class="nav-number">7.3.</span> <span class="nav-text">Association Validations and Isolation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Quantifying-Association-Anomalies"><span class="nav-number">7.4.</span> <span class="nav-text">Quantifying Association Anomalies</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Takeaways-and-Discussion"><span class="nav-number">7.5.</span> <span class="nav-text">Takeaways and Discussion</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IMPLICATIONS-FOR-DATABASES"><span class="nav-number">8.</span> <span class="nav-text">IMPLICATIONS FOR DATABASES</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Summary-Shortcomings-Today"><span class="nav-number">8.1.</span> <span class="nav-text">Summary: Shortcomings Today</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Domesticating-Feral-Mechanisms"><span class="nav-number">8.2.</span> <span class="nav-text">Domesticating Feral Mechanisms</span></a></li></ol></li></ol></div>
             
 
           </div>
