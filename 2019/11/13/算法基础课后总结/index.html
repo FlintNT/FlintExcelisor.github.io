@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Flint&#39;s Blog">
 <meta property="og:description" content="二叉搜索树的数据结构、实现的基本方法、经典算法、课后有趣的题目总结。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-11-13T14:10:39.170Z">
+<meta property="og:updated_time" content="2019-11-17T07:17:50.761Z">
 <meta name="twitter:card" content="summary">
 
 
@@ -362,7 +362,29 @@
 </ul>
 </li>
 </ul>
-
+<h2 id="TBD"><a href="#TBD" class="headerlink" title="(TBD)"></a>(TBD)</h2><h1 id="红黑树总结"><a href="#红黑树总结" class="headerlink" title="红黑树总结"></a>红黑树总结</h1><h2 id="红黑树的性质"><a href="#红黑树的性质" class="headerlink" title="红黑树的性质"></a>红黑树的性质</h2><h3 id="为什么红黑树是“平衡”的"><a href="#为什么红黑树是“平衡”的" class="headerlink" title="为什么红黑树是“平衡”的"></a>为什么红黑树是“平衡”的</h3><p>通过任何一条从根到叶子的简单路径上的各个结点的颜色进行约束红黑树确保没有一条路径会比其他路径长出2倍，因而是近似于平衡的。</p>
+<ul>
+<li>性质4: 如果一个结点是红色的，那么它的子结点一定是黑色的。</li>
+<li>性质5:对每个结点，从该结点到其所有后代叶结点的简单路径上均包含相同数目的黑色结点。</li>
+</ul>
+<p>用这两条性质就可以证明。</p>
+<h3 id="红黑树是满足下列性质的二叉搜索树"><a href="#红黑树是满足下列性质的二叉搜索树" class="headerlink" title="红黑树是满足下列性质的二叉搜索树"></a>红黑树是满足下列性质的二叉搜索树</h3><ol>
+<li>每个结点要么红色要么黑色</li>
+<li>根结点是黑色的</li>
+<li>每个叶子结点是黑色的</li>
+<li>如果有一个结点是红色，那么它的子结点一定是黑色</li>
+<li>对每个结点，从该结点到其所有后代叶结点的简单路径（无环）上包含相同数目的黑色结点</li>
+<li>注意⚠️：红黑树是一颗<strong>二叉搜索树</strong></li>
+</ol>
+<h3 id="红黑树的结点的“黑高”"><a href="#红黑树的结点的“黑高”" class="headerlink" title="红黑树的结点的“黑高”"></a>红黑树的结点的“黑高”</h3><p>给定红黑树的结点，从该结点出发（不含这个结点）到达一个叶结点的任意一条简单路径上的黑色结点数目都相同（根据性质5），这个数字被称为结点的<strong>黑高</strong>（black-height）。</p>
+<p>红黑树的黑高为其根结点的黑高，记为<code>bh(x)</code>。</p>
+<h3 id="引理：一颗有n个内部结点的红黑树的高度至多为2lg-n-1"><a href="#引理：一颗有n个内部结点的红黑树的高度至多为2lg-n-1" class="headerlink" title="引理：一颗有n个内部结点的红黑树的高度至多为2lg(n-1)"></a>引理：一颗有n个内部结点的红黑树的高度至多为<code>2lg(n-1)</code></h3><ol>
+<li>断言：以任一结点x为根的子树至少包含<code>2^bh(X) - 1</code>个内部结点</li>
+<li>断言：从根结点到叶子结点的简单路径（不包括根结点）上至少有一半的结点为黑色</li>
+</ol>
+<p>根据以上两个断言即可证明。</p>
+<h4 id="这条引理的意义"><a href="#这条引理的意义" class="headerlink" title="这条引理的意义"></a>这条引理的意义</h4><p>由该引理，动态集合操作<code>SEARCH</code>、<code>MINUMUM</code>、<code>MAXIMUM</code>、<code>SUCCESSOR</code>和<code>PREDECESSOR</code>都可以在红黑树上在<code>O(lgn)</code>时间内执行，因为它们在一颗高度为 h 的二叉树上的运行时间为<code>O(h)</code>，而任何包含 n 个结点的红黑树都是高度为<code>O(lgn)</code>的二叉搜索树。</p>
+<h2 id="红黑树的旋转"><a href="#红黑树的旋转" class="headerlink" title="红黑树的旋转"></a>红黑树的旋转</h2>
       
     </div>
     
@@ -552,7 +574,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#二叉搜索树"><span class="nav-number">1.</span> <span class="nav-text">二叉搜索树</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是二叉搜索树"><span class="nav-number">1.1.</span> <span class="nav-text">什么是二叉搜索树</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#二叉搜索树"><span class="nav-number">1.</span> <span class="nav-text">二叉搜索树</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是二叉搜索树"><span class="nav-number">1.1.</span> <span class="nav-text">什么是二叉搜索树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TBD"><span class="nav-number">1.2.</span> <span class="nav-text">(TBD)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#红黑树总结"><span class="nav-number">2.</span> <span class="nav-text">红黑树总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#红黑树的性质"><span class="nav-number">2.1.</span> <span class="nav-text">红黑树的性质</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么红黑树是“平衡”的"><span class="nav-number">2.1.1.</span> <span class="nav-text">为什么红黑树是“平衡”的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#红黑树是满足下列性质的二叉搜索树"><span class="nav-number">2.1.2.</span> <span class="nav-text">红黑树是满足下列性质的二叉搜索树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#红黑树的结点的“黑高”"><span class="nav-number">2.1.3.</span> <span class="nav-text">红黑树的结点的“黑高”</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#引理：一颗有n个内部结点的红黑树的高度至多为2lg-n-1"><span class="nav-number">2.1.4.</span> <span class="nav-text">引理：一颗有n个内部结点的红黑树的高度至多为2lg(n-1)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#这条引理的意义"><span class="nav-number">2.1.4.1.</span> <span class="nav-text">这条引理的意义</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#红黑树的旋转"><span class="nav-number">2.2.</span> <span class="nav-text">红黑树的旋转</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -777,26 +799,6 @@
   
 
   
-  
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Config({
-        tex2jax: {
-          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
-          processEscapes: true,
-          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-        }
-      });
-    </script>
-
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for (i=0; i < all.length; i += 1) {
-          all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-      });
-    </script>
-    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
   
 
 
